@@ -4,12 +4,12 @@ clean:
 	rm -f *.sty
 distclean: clean
 
-%.pdf:
-	pdflatex $*.tex
+%.pdf: %.tex
+	pdflatex $<
 	makeglossaries $*
 	biber $*
-	pdflatex $*.tex
+	pdflatex $<
 	makeglossaries $*
-	pdflatex $*.tex
+	pdflatex $<
 
-%.sty: $*.pdf
+%.sty: %.pdf
