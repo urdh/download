@@ -9,9 +9,9 @@ distclean: clean
 	pdflatex $<
 	makeglossaries $*
 	biber $*
-	pdflatex $<
+	pdflatex -shell-escape $<
 	makeglossaries $*
-	pdflatex $<
+	pdflatex -shell-escape $<
 
 %.sty: %.pdf
 
