@@ -41,8 +41,9 @@
 
 \begin{document}
     % Change & version info
-    \version{1.0}
+    \version{1.1}
     \changes{1.0}{Initial version}
+    \changes{1.1}{Added aria2 and axel engines}
 
     % Metadata
     \package[ctan=download,vcs=https://github.com/urdh/download]{download}
@@ -53,12 +54,13 @@
     \maketitle
     \begin{abstract}
         The \thepackage\ package allows \LaTeX\ to download files using
-        cURL or wget.
+        cURL, wget, aria2 or axel.
     \end{abstract}
 
     \section{Introduction}
     This package, inspired by a question on \TeX.SE\footcite{Klinger12},
-    allows \LaTeX\ to download files using cURL or wget. Since it needs
+    allows \LaTeX\ to download files using one of four engines.
+    Since it needs
     to run external commands, it requires unrestricted \cs{write18}
     access \Notice{do not indiscriminately run \hologo{pdfLaTeX} with
     the \texttt{--shell-escape} flag; using this package it would be
@@ -67,29 +69,33 @@
 
     \section{Usage}
     The package is very simple to use, but requires a *nix platform with
-    either cURL or wget installed and present in the \texttt{PATH}.
+    any of the engines installed and present in the \texttt{PATH}.
 
     \subsection{Options}
-    \Option{engine}\WithValues{auto,curl,wget}\AndDefault{auto}
+    \Option{engine}\WithValues{auto,curl,wget,aria2,axel}\AndDefault{auto}
     The package only has one option, which controls what underlying
     software is used to download the file. As of version \theversion,
-    the two engines available are cURL and wget. The default, which is
+    the four engines available are cURL, wget, aria2 and axel.
+    The default, which is
     used when no option is supplied, is \texttt{auto}. In this mode,
-    \thepkg\ will look for wget and cURL, in that order, and use the
-    first one available.
+    \thepkg\ will look for wget, cURL, aria2 and axel, in that order,
+    and use the first one available.
 
     \subsection{Macros}
     \DescribeMacro\download[<filename>]{<url>}
     The only macro provided by \thepkg\ is \cs{download}. With it, you
     can download any file from any \meta{url} supported by the underlying
     engine (wget supports \texttt{http(s)} and \texttt{ftp}, cURL
-    supports a few more; for most cases wget should be enough). The
+    supports a few more, aria2 supports torrent downloads and axel
+    supports downloading from multiple mirrors at once\footnote{See the
+    manpage of the respective command for more information.}; for most 
+    cases  wget should be enough). The
     optional argument \meta{filename} makes the underlying engine save
     the file with the specified filename \Notice{this also enables file
-    existence checking; without it, wget and cURL will attempt to
-    download the file even if it exists --- wget see the existing file
-    and do nothing, but cURL will download a new copy with a numeral
-    suffix}.
+    existence checking; without it, the engine will attempt to
+    download the file even if it exists --- wget and aria2 see the 
+    existing file and do nothing, and axel probably replaces any existing
+    file but cURL will download a new copy with a numeral suffix}.
 
     \Implementation
     \SelfPreambleTo{\mypreamble}
@@ -109,7 +115,7 @@
     Then, we declare ourselves to provide the \thepkg\ \LaTeX3 package.
 \begin{MacroCode}{package}
 \ProvidesExplPackage{download}
-    {2012/12/31}{1.0}{download files with LaTeX}
+    {2013/04/08}{1.1}{download files with LaTeX}
 \end{MacroCode}
 
     \subsection{Messages}
@@ -121,8 +127,8 @@
 \begin{MacroCode}{package}
 \msg_new:nnnn{download}{no-write18}{Could~not~use~\string\write18!}
     {Please~run~`latex`~with~the~`--shell-escape`~flag.}
-\msg_new:nnnn{download}{no-engine}{Could~not~find~cURL~or~wget!}
-    {Please~make~sure~either~cURL~or~wget~is~installed~and~in~your~PATH.}
+\msg_new:nnnn{download}{no-engine}{Could~not~find~any~engine!}
+    {Please~make~sure~one~of~the~engines~is~installed~and~in~your~PATH.}
 \end{MacroCode}
     
     We also have a message being displayed when \cs{download} is being
@@ -138,6 +144,8 @@
 \begin{MacroCode}{package}
 \msg_new:nnn{download}{use-curl}{Using~cURL.}
 \msg_new:nnn{download}{use-wget}{Using~wget.}
+\msg_new:nnn{download}{use-ariaII}{Using~aria2.}
+\msg_new:nnn{download}{use-axel}{Using~axel.}
 \end{MacroCode}
 
     \subsection{The \cs{write18} test}
@@ -186,73 +194,36 @@
 \end{MacroCode}
     \end{macro}
 
-    \subsection{Testing for cURL and wget}
-    Testing for the existence of wget and cURL is done by calling
+    \subsection{Testing for the applications}
+    Testing for the existence of executables is done by calling
     the standard *nix \texttt{which} command. We define one conditional
-    for every engine (starting with cURL):
-    \begin{macro}{\__download_if_curl_test:TF}
-    \begin{macro}{\__download_if_curl_test:T}
-    \begin{macro}{\__download_if_curl_test:F}
-    \begin{macro}{\__download_if_curl_test_p:}
+    for all engines:
+    \begin{macro*}{\__download_if_executable_test:nF}
+    \begin{macro*}{\__download_if_executable_test:nT}
+    \begin{macro}{\__download_if_executable_test:nTF}[1]
+                 {The executable to test the existence of}
+    \changes{1.1}{Condensed test macros into one macro with an argument}
 \begin{MacroCode}{package}
-\prg_new_conditional:Nnn\__download_if_curl_test:{TF,T,F,p}{
+\prg_new_conditional:Npnn\__download_if_executable_test:n#1{TF,T,F,p}{
 \end{MacroCode}
     First, run \texttt{which} to create the temporary file.
 \begin{MacroCode}{package}
-    \immediate\write18{which~curl~&&~touch~\jobname.aex}
+    \immediate\write18{which~#1~&&~touch~\jobname.aex}
 \end{MacroCode}
-    A temporary boolean is defined to hold the result of the test (this
-    is a bit of carco cult programming, any clues as to why placing the
-    result inside \cs{file_if_exists:nTF} doesn't work are welcome), and
-    if the test is successful we remove the temporary file.
+    If the temporary file exists, we delete it and return true.
+    Otherwise, we return false.
 \begin{MacroCode}{package}
-    \bool_set:Nn\l_tmpa_bool{\c_false_bool}
     \file_if_exist:nTF{\jobname.aex}{
         \__download_rm:n{\jobname.aex}
-        \bool_set:Nn\l_tmpa_bool{\c_true_bool}
-    }{}
-\end{MacroCode}
-    Finally, the temporary boolean is used to return a result.
-\begin{MacroCode}{package}
-    \if_bool:N\l_tmpa_bool
         \prg_return_true:
-    \else:
+    }{
         \prg_return_false:
-    \fi:
+    }
 }
 \end{MacroCode}
     \end{macro}
-    \end{macro}
-    \end{macro}
-    \end{macro}
-
-    The conditional for wget is defined analogously to that of cURL
-    (again, a bit of cargo cult programming; ideally we'd be DRY and have
-    one does-this-executable-exist-conditional, but for some reason that
-    wouldn't work out for me --- hints appreciated).
-    \begin{macro}{\__download_if_wget_test:TF}
-    \begin{macro}{\__download_if_wget_test:T}
-    \begin{macro}{\__download_if_wget_test:F}
-    \begin{macro}{\__download_if_wget_test_p:}
-\begin{MacroCode}{package}
-\prg_new_conditional:Nnn\__download_if_wget_test:{TF,T,F,p}{
-    \immediate\write18{which~wget~&&~touch~\jobname.aex}
-    \bool_set:Nn\l_tmpa_bool{\c_false_bool}
-    \file_if_exist:nTF{\jobname.aex}{
-        \__download_rm:n{\jobname.aex}
-        \bool_set:Nn\l_tmpa_bool{\c_true_bool}
-    }{}
-    \if_bool:N\l_tmpa_bool
-        \prg_return_true:
-    \else:
-        \prg_return_false:
-    \fi:
-}
-\end{MacroCode}
-    \end{macro}
-    \end{macro}
-    \end{macro}
-    \end{macro}
+    \end{macro*}
+    \end{macro*}
 
     \subsection{Using cURL and wget}
     Actually using cURL and wget for downloading is simple, issuing
@@ -262,20 +233,22 @@
     \begin{macro}{\__download_curl_do:nn}[2]
         {Filename to save file to, or \cs{NoValue}}
         {URL to fetch the file from}
+    \changes{1.1}{cURL now follows redirects}
 \begin{MacroCode}{package}
 \cs_new:Npn\__download_curl_do:nn#1#2{
     \IfNoValueTF{#1}{
 \end{MacroCode}
     When no optional argument is given, we just invoke cURL with the
-    \texttt{-s} (silent) flag.
+    \texttt{-s} (silent) flag as well as the \texttt{-L} (follow
+    redirects) flag.
 \begin{MacroCode}{package}
-        \immediate\write18{curl~-s~#2}
+        \immediate\write18{curl~-L~-s~#2}
     }{
 \end{MacroCode}
     When we \emph{do} have an optional argument, we add the \texttt{-o}
     flag to specify the output file.
 \begin{MacroCode}{package}
-        \immediate\write18{curl~-s~-o~#1~#2}
+        \immediate\write18{curl~-L~-s~-o~#1~#2}
     }
 }
 \end{MacroCode}
@@ -289,7 +262,7 @@
     \IfNoValueTF{#1}{
 \end{MacroCode}
     With wget, we pass the \texttt{-q} (quiet) flag as well as the
-    \texttt{-nc} (no clobber) file, to avoid downloading files that
+    \texttt{-nc} (no clobber) flag, to avoid downloading files that
     already exist.
 \begin{MacroCode}{package}
         \immediate\write18{wget~-q~-nc~#2}
@@ -304,48 +277,107 @@
 \end{MacroCode}
     \end{macro}
 
+    \begin{macro}{\__download_ariaII_do:nn}[2]
+        {Filename to save file to, or \cs{NoValue}}
+        {URL to fetch the file from}
+\begin{MacroCode}{package}
+\cs_new:Npn\__download_ariaII_do:nn#1#2{
+    \IfNoValueTF{#1}{
+\end{MacroCode}
+    With aria2, we pass the \texttt{-q} (quiet) flag as well as the
+    \texttt{--auto-file-renaming=false} (no clobber) flag, to avoid
+    creating a lot of duplicate files.
+\begin{MacroCode}{package}
+        \immediate\write18{aria2c~-q~--auto-file-renaming=false~#2}
+    }{
+\end{MacroCode}
+    Again, when we have an optional argument we add the \texttt{-o}
+    flag to specify the output file.
+\begin{MacroCode}{package}
+        \immediate\write18{aria2c~-q~--auto-file-renaming=false~-o~#1~#2}
+    }
+}
+\end{MacroCode}
+    \end{macro}
+
+    \begin{macro}{\__download_axel_do:nn}[2]
+        {Filename to save file to, or \cs{NoValue}}
+        {URL to fetch the file from}
+\begin{MacroCode}{package}
+\cs_new:Npn\__download_axel_do:nn#1#2{
+    \IfNoValueTF{#1}{
+\end{MacroCode}
+    With axel, we pass the \texttt{-q} (quiet) flag.
+\begin{MacroCode}{package}
+        \immediate\write18{axel~-q~#2}
+    }{
+\end{MacroCode}
+    Again, when we have an optional argument we add the \texttt{-o}
+    flag to specify the output file.
+\begin{MacroCode}{package}
+        \immediate\write18{axel~-q~-o~#1~#2}
+    }
+}
+\end{MacroCode}
+    \end{macro}
+
     \subsection{The \texttt{auto} engine}
     The automatic engine uses the tests and macros of the other engines
     to provide functionality without selecting an engine. We first
     define a conditional that, in essence, steps through the available
     engines testing for their existence. If any of them exist, we're in
     business.
+    \begin{macro*}{\__download_if_auto_test:TF}
     \begin{macro}{\__download_if_auto_test:F}
+    \changes{1.1}{Added aria2c and axel engines to stack}
 \begin{MacroCode}{package}
-\prg_new_conditional:Nnn\__download_if_auto_test:{F}{
-\end{MacroCode}
-    To avoid excessive nesting of conditional statements, we define
-    a boolean (initialized to \cs{c_false_bool}) which we then set to
-    \cs{c_true_bool} every time we find an engine that exists.
-\begin{MacroCode}{package}
-    \bool_set:Nn\l_tmpb_bool{\c_false_bool}
-    \__download_if_curl_test:T{\bool_set:Nn\l_tmpb_bool{\c_true_bool}}
-    \__download_if_wget_test:T{\bool_set:Nn\l_tmpb_bool{\c_true_bool}}
-\end{MacroCode}
-    We use that boolean to return a result from the conditional.
-\begin{MacroCode}{package}
-    \if_bool:N\l_tmpb_bool
+\prg_new_conditional:Nnn\__download_if_auto_test:{F,TF}{
+    \__download_if_executable_test:nTF{wget}{
         \prg_return_true:
-    \else:
-        \prg_return_false:
-    \fi:
+    }{
+        \__download_if_executable_test:nTF{curl}{
+            \prg_return_true:
+        }{
+            \__download_if_executable_test:nTF{aria2c}{
+                \prg_return_true:
+            }{
+                \__download_if_executable_test:nTF{axel}{
+                    \prg_return_true:
+                }{
+                    \prg_return_false:
+                }
+            }
+        }
+    }
 }
 \end{MacroCode}
     \end{macro}
+    \end{macro*}
 
     We also define an automatic equivalent of the engine \texttt{_do}
-    macros, which selects wget if possible and cURL as a second choice.
+    macros, which selects the engines in the order wget, cURL, aria2 
+    and axel.
     \begin{macro}{\__download_auto_do:nn}[2]
         {Filename to save file to, or \cs{NoValue}}
         {URL to fetch the file from}
 \begin{MacroCode}{package}
 \cs_new:Npn\__download_auto_do:nn#1#2{
-    \__download_if_wget_test:TF{
+    \__download_if_executable_test:nTF{wget}{
         \msg_info:nn{download}{use-wget}
         \__download_wget_do:nn{#1}{#2}
     }{
-        \msg_info:nn{download}{use-curl}
-        \__download_curl_do:nn{#1}{#2}
+        \__download_if_executable_test:nTF{curl}{
+            \msg_info:nn{download}{use-curl}
+            \__download_curl_do:nn{#1}{#2}
+        }{
+            \__download_if_executable_test:nTF{aria2c}{
+                \msg_info:nn{download}{use-ariaII}
+                \__download_ariaII_do:nn{#1}{#2}
+            }{
+                \msg_info:nn{download}{use-axel}
+                \__download_axel_do:nn{#1}{#2}
+            }
+        }
     }
 }
 \end{MacroCode}
@@ -369,16 +401,32 @@
 \begin{MacroCode}{package}
     engine / auto .code:n =
         {\cs_gset_eq:NN\__download_do:nn\__download_auto_do:nn
-         \prg_new_eq_conditional:NNn\__download_if_test:\__download_if_auto_test:{F}},
+         \prg_set_conditional:Nnn\__download_if_test:{F}{
+            \__download_if_auto_test:TF
+                {\prg_return_true:}{\prg_return_false:}}},
 \end{MacroCode}
-    We do the same for the cURL and wget options.
+    We do the same for the other options.
 \begin{MacroCode}{package}
     engine / curl .code:n =
         {\cs_gset_eq:NN\__download_do:nn\__download_curl_do:nn
-         \prg_new_eq_conditional:NNn\__download_if_test:\__download_if_curl_test:{F}},
+         \prg_set_conditional:Nnn\__download_if_test:{F}{
+            \__download_if_executable_test:nTF{curl}
+                {\prg_return_true:}{\prg_return_false:}}},
     engine / wget .code:n =
         {\cs_gset_eq:NN\__download_do:nn\__download_wget_do:nn
-         \prg_new_eq_conditional:NNn\__download_if_test:\__download_if_wget_test:{F}},
+         \prg_set_conditional:Nnn\__download_if_test:{F}{
+            \__download_if_executable_test:nTF{wget}
+                {\prg_return_true:}{\prg_return_false:}}},
+    engine / aria2 .code:n =
+        {\cs_gset_eq:NN\__download_do:nn\__download_ariaII_do:nn
+         \prg_set_conditional:Nnn\__download_if_test:{F}{
+            \__download_if_executable_test:nTF{aria2c}
+                {\prg_return_true:}{\prg_return_false:}}},
+    engine / axel .code:n =
+        {\cs_gset_eq:NN\__download_do:nn\__download_axel_do:nn
+         \prg_set_conditional:Nnn\__download_if_test:{F}{
+            \__download_if_executable_test:nTF{axel}
+                {\prg_return_true:}{\prg_return_false:}}},
 \end{MacroCode}
     \end{macro}
     \end{macro}
