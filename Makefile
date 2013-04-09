@@ -5,15 +5,15 @@ clean:
 	rm -f *.sty
 distclean: clean
 
-%.pdf: %.tex
-	pdflatex $<
+%.pdf: %.tex %.sty
 	makeglossaries $*
 	biber $*
 	pdflatex -shell-escape $<
 	makeglossaries $*
 	pdflatex -shell-escape $<
 
-%.sty: %.pdf
+%.sty: %.tex
+	pdflatex $<
 
 install: all
 	install -m 0644 download.sty $(TEXMFHOME)/tex/latex/download/download.sty
