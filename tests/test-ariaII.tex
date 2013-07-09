@@ -1,0 +1,9 @@
+\documentclass{minimal}
+\usepackage{verbatim}
+\usepackage[engine=aria2]{../download}
+
+\begin{document}
+	\download[travis-aria2.yml]%
+		{https://raw.github.com/urdh/download/master/.travis.yml}
+	\verbatiminput{travis-aria2.yml}
+\end{document}

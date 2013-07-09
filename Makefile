@@ -1,10 +1,10 @@
 TEXMFHOME ?= $(shell kpsewhich -var-value TEXMFHOME)
-.PHONY: all clean distclean install dist
+.PHONY: all clean distclean install dist test clean-test
 all: download.pdf
-clean:
+clean: clean-test
 	rm -f *.gl? *.id? *.aux # problematic files
 	rm -f *.bbl *.bcf *.bib *.blg *.xdy # biblatex
-	rm -f *.fls *.log *.out *.run.xml *.tox # junk
+	rm -f *.fls *.log *.out *.run.xml *.toc # junk
 distclean: clean
 	rm -f *.cls *.sty *.clo *.tar.gz *.tds.zip
 	git reset --hard
@@ -45,3 +45,9 @@ download.tar.gz: download.tds.zip download.tex download.pdf
 	rm -rf download
 
 dist: download.tar.gz
+
+test:
+	$(MAKE) -C tests
+
+clean-test:
+	$(MAKE) -C tests clean

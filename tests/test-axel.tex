@@ -1,0 +1,9 @@
+\documentclass{minimal}
+\usepackage{verbatim}
+\usepackage[engine=axel]{../download}
+
+\begin{document}
+	\download[travis-axel.yml]%
+		{https://raw.github.com/urdh/download/master/.travis.yml}
+	\verbatiminput{travis-axel.yml}
+\end{document}

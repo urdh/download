@@ -1,0 +1,9 @@
+\documentclass{minimal}
+\usepackage{verbatim}
+\usepackage[engine=curl]{../download}
+
+\begin{document}
+	\download[travis-curl.yml]%
+		{https://raw.github.com/urdh/download/master/.travis.yml}
+	\verbatiminput{travis-curl.yml}
+\end{document}
