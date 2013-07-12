@@ -27,9 +27,11 @@ install: all
 	-mktexlsr
 
 download.tds.zip: download.tex download.pdf download.sty
-	mkdir -p download/{tex,doc,source}/latex/download
+	mkdir -p download/tex/latex/download
 	cp download.sty download/tex/latex/download/download.sty
+	mkdir -p download/doc/latex/download
 	cp download.pdf download/doc/latex/download/download.pdf
+	mkdir -p download/source/latex/download
 	cp download.tex download/source/latex/download/download.tex
 	cp README download/doc/latex/download/README
 	cd download && zip -r ../download.tds.zip *
