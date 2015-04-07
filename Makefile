@@ -20,7 +20,7 @@ distclean: clean
 	pdflatex -interaction=nonstopmode -halt-on-error $<
 
 README: README.md
-	sed -e '1,4d;$$d' README.md > README
+	sed -e '1,4d;$$d' $< > $@
 
 install: all
 	install -m 0644 download.sty $(TEXMFHOME)/tex/latex/download/download.sty
