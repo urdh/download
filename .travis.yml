@@ -28,3 +28,13 @@ script:
 
 after_success:
   - ./deploy-ctan.sh download.tar.gz
+
+deploy:
+  provider: releases
+  api_key:
+    secure: Jgu+Q5mnEtWEbGAz/BCVOUM8o5vSowJSby2AUglmyfKEmnef68VdxCeRIjr3h1JJUgdCh7n5zBpQzAa4/MyfpSnhz71t+a+0w23dTv0BgBTPGgpzsSHNupvCVFxzcOVxWWg16LcMnDXwh+peTQsq9+lHySRIvdUPQMfRWH+Naxs=
+  file: download.tar.gz
+  skip_cleanup: true
+  on:
+    repo: urdh/download
+    tags: true
