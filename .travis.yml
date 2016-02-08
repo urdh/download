@@ -17,6 +17,7 @@ install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq wget aria2 axel curl
   - PATH=$HOME/texlive/bin/x86_64-linux:$PATH
+  - tlmgr update --self
   - tlmgr install paratype
   - tlmgr install opensans
   - tlmgr install sourcecodepro
