@@ -1,10 +1,10 @@
-[![Travis CI](https://img.shields.io/travis/urdh/download.svg)](http://travis-ci.org/urdh/download)
+[![Travis CI](https://img.shields.io/travis/urdh/download/master.svg)](http://travis-ci.org/urdh/download)
 [![CTAN: Version](https://img.shields.io/ctan/v/download.svg)](http://www.ctan.org/pkg/download)
 [![CTAN: License](https://img.shields.io/ctan/l/download.svg)](http://www.ctan.org/pkg/download)
 ```
 %% download - download files with LaTeX
 %%
-%% Copyright (C) 2012-2015 by Simon Sigurdhsson <sigurdhsson@gmail.com>
+%% Copyright (C) 2012-2016 by Simon Sigurdhsson <sigurdhsson@gmail.com>
 %% 
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
