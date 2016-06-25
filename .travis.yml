@@ -7,6 +7,7 @@ env:
     - NAME="Simon Sigurdhsson"
     - EMAIL="Sigurdhsson@gmail.com"
     - DIRECTORY=/macros/latex/contrib/download
+    - DUMMARY="Allow LaTeX to download files using an external process"
     - LICENSE=free
     - FREEVERSION=lppl
 
