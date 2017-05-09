@@ -37,7 +37,7 @@ after_success:
 deploy:
   provider: releases
   api_key:
-    secure: Jgu+Q5mnEtWEbGAz/BCVOUM8o5vSowJSby2AUglmyfKEmnef68VdxCeRIjr3h1JJUgdCh7n5zBpQzAa4/MyfpSnhz71t+a+0w23dTv0BgBTPGgpzsSHNupvCVFxzcOVxWWg16LcMnDXwh+peTQsq9+lHySRIvdUPQMfRWH+Naxs=
+    secure: HkXhNDBorf0aVIVOJJJ7nqOhIUZr6EnnXMjZvYDoWx2Ej4L46z0czstevrcVVDF4S20LCFL3Dcg82FUA7EaWMbl8Tv4l4M7DSqK4iPjT0GxVOde5jBV4ZBe05iBCH38deaeY0F4R9l12UR5r09PN1/zH1I31hUIIDNdm8kRlbpE=
   file: download.tar.gz
   skip_cleanup: true
   on:
