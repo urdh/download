@@ -29,24 +29,14 @@ install: all
 	install -m 0644 README $(TEXMFHOME)/doc/latex/download/README
 	-mktexlsr
 
-download.tds.zip: all
-	mkdir -p download/tex/latex/download
-	cp download.sty download/tex/latex/download/download.sty
-	mkdir -p download/doc/latex/download
-	cp download.pdf download/doc/latex/download/download.pdf
-	mkdir -p download/source/latex/download
-	cp download.tex download/source/latex/download/download.tex
-	cp README download/doc/latex/download/README
-	cd download && zip -r ../download.tds.zip *
-	rm -rf download
-
-download.tar.gz: all download.tds.zip
-	mkdir -p download
-	cp download.tex download/download.tex
+download.tar.gz: all
+	mkdir -p        download
+	cp README       download/README
+	cp Makefile     download/Makefile
 	cp download.pdf download/download.pdf
-	cp README download/README
-	cp Makefile download/Makefile
-	tar -czf $@ download download.tds.zip
+	cp download.tex download/download.tex
+	cp download.sty download/download.sty
+	tar -czf $@ download
 	rm -rf download
 
 dist: download.tar.gz
