@@ -1,3 +1,13 @@
+ZIP_NOATTRS :=
+ifeq ($(shell uname -s),Darwin)
+	ZIP_NOATTRS += -X
+endif
+
+TAR_NOATTRS :=
+ifeq ($(shell uname -s),Darwin)
+	TAR_NOATTRS += --disable-copyfile
+endif
+
 TEXMFHOME ?= $(shell kpsewhich -var-value TEXMFHOME)
 .PHONY: all clean distclean install dist test clean-test
 all: download.tex download.pdf download.sty README
@@ -37,7 +47,7 @@ download.tds.zip: all
 	mkdir -p download/source/latex/download
 	cp download.tex download/source/latex/download/download.tex
 	cp README download/doc/latex/download/README
-	cd download && zip -r ../download.tds.zip *
+	cd download && zip $(ZIP_NOATTRS) -r ../download.tds.zip *
 	rm -rf download
 
 download.tar.gz: all download.tds.zip
@@ -46,7 +56,7 @@ download.tar.gz: all download.tds.zip
 	cp download.pdf download/download.pdf
 	cp README download/README
 	cp Makefile download/Makefile
-	tar -czf $@ download download.tds.zip
+	tar $(TAR_NOATTRS) -czf $@ download download.tds.zip
 	rm -rf download
 
 dist: download.tar.gz
