@@ -4,8 +4,8 @@
 ```
 %% download - download files with LaTeX
 %%
-%% Copyright (C) 2012-2016 by Simon Sigurdhsson <sigurdhsson@gmail.com>
-%% 
+%% Copyright (C) 2012-2019 by Simon Sigurdhsson <sigurdhsson@gmail.com>
+%%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
 %% of this license or (at your option) any later version.
@@ -21,7 +21,7 @@
 %% This work consists of the file download.tex
 %% and the derived file download.sty.
 
-This is version 1.0 of the download package, a package which allows
+This is version 1.2 of the download package, a package which allows
 LaTeX to download files using wget or cURL.
 
 The following files are enclosed.
