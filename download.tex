@@ -44,7 +44,7 @@
     \version{1.1}
     \changes{1.0}{Initial version}
     \changes{1.1}{Added aria2 and axel engines}
-    \changes{1.2}{Protect a bunch of macros and conditionals}
+    \changes{1.2}{Protect a bunch of macros and conditionals. Track \pkg{expl3} changes (thanks to Phelype Oleinik)}
     % Don't forget to update the version number and release date of
     % the package declaration in the implementation!
 
@@ -167,7 +167,7 @@
     if no \cs{write18} access is available, two if we have restricted
     access and one if access is unrestricted.
 \begin{MacroCode}{package}
-        \if_int_compare:w\pdf@shellescape=\c_one
+        \if_int_compare:w\pdf@shellescape=\c_one_int
             \prg_return_true:
         \else:
             \prg_return_false:
