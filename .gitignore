@@ -11,6 +11,7 @@
 *.glg
 *.glo
 *.gls
+*.glsdefs
 *.idx
 *.ilg
 *.ind
@@ -49,3 +50,4 @@
 download.tar.gz
 download.tds.zip
 README
+tests/*.yml

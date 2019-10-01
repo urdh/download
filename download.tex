@@ -1,7 +1,7 @@
 %% download - download files with LaTeX
 %%
 %% Copyright (C) 2012-2016 by Simon Sigurdhsson <sigurdhsson@gmail.com>
-%% 
+%%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
 %% of this license or (at your option) any later version.
@@ -9,11 +9,11 @@
 %%   http://www.latex-project.org/lppl.txt
 %% and version 1.3 or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
-%% 
+%%
 %% This work has the LPPL maintenance status `maintained'.
-%% 
+%%
 %% The Current Maintainer of this work is Simon Sigurdhsson.
-%% 
+%%
 %% This work consists of the file download.tex
 %% and the derived file download.sty.
 \documentclass{skdoc}
@@ -44,6 +44,7 @@
     \version{1.1}
     \changes{1.0}{Initial version}
     \changes{1.1}{Added aria2 and axel engines}
+    \changes{1.2}{Protect a bunch of macros and conditionals}
     % Don't forget to update the version number and release date of
     % the package declaration in the implementation!
 
@@ -67,7 +68,7 @@
     access \Notice{do not indiscriminately run \hologo{pdfLaTeX} with
     the \texttt{--shell-escape} flag; using this package it would be
     possible to download malicious \texttt{.tex} that may abuse the
-    \cs{write18} access to harm your system}. 
+    \cs{write18} access to harm your system}.
 
     \section{Usage}
     The package is very simple to use, but requires a *nix platform with
@@ -90,12 +91,12 @@
     engine (wget supports \texttt{http(s)} and \texttt{ftp}, cURL
     supports a few more, aria2 supports torrent downloads and axel
     supports downloading from multiple mirrors at once\footnote{See the
-    manpage of the respective command for more information.}; for most 
+    manpage of the respective command for more information.}; for most
     cases  wget should be enough). The
     optional argument \meta{filename} makes the underlying engine save
     the file with the specified filename \Notice{this also enables file
     existence checking; without it, the engine will attempt to
-    download the file even if it exists --- wget and aria2 see the 
+    download the file even if it exists --- wget and aria2 see the
     existing file and do nothing, and axel probably replaces any existing
     file but cURL will download a new copy with a numeral suffix}.
 
@@ -113,7 +114,7 @@
 \begin{MacroCode}{package}
 \RequirePackage{expl3,l3keys2e,pdftexcmds,xparse}
 \end{MacroCode}
-    
+
     Then, we declare ourselves to provide the \thepkg\ \LaTeX3 package.
 \begin{MacroCode}{package}
 \ProvidesExplPackage{download}
@@ -132,7 +133,7 @@
 \msg_new:nnnn{download}{no-engine}{Could~not~find~any~engine!}
     {Please~make~sure~one~of~the~engines~is~installed~and~in~your~PATH.}
 \end{MacroCode}
-    
+
     We also have a message being displayed when \cs{download} is being
     used without its optional argument. This is a warning, since it may
     imply that cURL is creating a lot of unwanted files.
@@ -140,7 +141,7 @@
 \msg_new:nnnn{download}{no-name}{Using~\string\download\space~with~no~filename!}
     {This~means~I~will~download~the~file~even~if~it~already~exists.}
 \end{MacroCode}
-    
+
     The last two messages are diagnostics written to the log when
     \opt{engine} is set to \texttt{auto}.
 \begin{MacroCode}{package}
@@ -156,8 +157,9 @@
     can define a new conditional that decides if we have unrestricted
     \cs{write18}.
     \begin{macro}{\__download_if_shellescape:F}
+    \changes{1.2}{This conditional is now protected}
 \begin{MacroCode}{package}
-\prg_new_conditional:Nnn\__download_if_shellescape:{F}{
+\prg_new_protected_conditional:Nnn\__download_if_shellescape:{F}{
     \if_cs_exist:N\pdf@shellescape
 \end{MacroCode}
     If the command sequence exists (it really should), we test to see
@@ -189,8 +191,9 @@
     an old file may break the check.
     \begin{macro}{\__download_rm:n}[1]
         {The file to be removed}
+    \changes{1.2}{This macro is now protected}
 \begin{MacroCode}{package}
-\cs_new:Npn\__download_rm:n#1{
+\cs_new_protected:Npn\__download_rm:n#1{
     \immediate\write18{rm~#1}
 }
 \end{MacroCode}
@@ -236,8 +239,9 @@
         {Filename to save file to, or \cs{NoValue}}
         {URL to fetch the file from}
     \changes{1.1}{cURL now follows redirects}
+    \changes{1.2}{This macro is now protected}
 \begin{MacroCode}{package}
-\cs_new:Npn\__download_curl_do:nn#1#2{
+\cs_new_protected:Npn\__download_curl_do:nn#1#2{
     \IfNoValueTF{#1}{
 \end{MacroCode}
     When no optional argument is given, we just invoke cURL with the
@@ -259,8 +263,9 @@
     \begin{macro}{\__download_wget_do:nn}[2]
         {Filename to save file to, or \cs{NoValue}}
         {URL to fetch the file from}
+    \changes{1.2}{This macro is now protected}
 \begin{MacroCode}{package}
-\cs_new:Npn\__download_wget_do:nn#1#2{
+\cs_new_protected:Npn\__download_wget_do:nn#1#2{
     \IfNoValueTF{#1}{
 \end{MacroCode}
     With wget, we pass the \texttt{-q} (quiet) flag as well as the
@@ -282,8 +287,9 @@
     \begin{macro}{\__download_ariaII_do:nn}[2]
         {Filename to save file to, or \cs{NoValue}}
         {URL to fetch the file from}
+    \changes{1.2}{This macro is now protected}
 \begin{MacroCode}{package}
-\cs_new:Npn\__download_ariaII_do:nn#1#2{
+\cs_new_protected:Npn\__download_ariaII_do:nn#1#2{
     \IfNoValueTF{#1}{
 \end{MacroCode}
     With aria2, we pass the \texttt{-q} (quiet) flag as well as the
@@ -305,8 +311,9 @@
     \begin{macro}{\__download_axel_do:nn}[2]
         {Filename to save file to, or \cs{NoValue}}
         {URL to fetch the file from}
+    \changes{1.2}{This macro is now protected}
 \begin{MacroCode}{package}
-\cs_new:Npn\__download_axel_do:nn#1#2{
+\cs_new_protected:Npn\__download_axel_do:nn#1#2{
     \IfNoValueTF{#1}{
 \end{MacroCode}
     With axel, we pass the \texttt{-q} (quiet) flag.
@@ -332,8 +339,9 @@
     \begin{macro*}{\__download_if_auto_test:TF}
     \begin{macro}{\__download_if_auto_test:F}
     \changes{1.1}{Added aria2c and axel engines to stack}
+    \changes{1.2}{This conditional is now protected}
 \begin{MacroCode}{package}
-\prg_new_conditional:Nnn\__download_if_auto_test:{F,TF}{
+\prg_new_protected_conditional:Nnn\__download_if_auto_test:{F,TF}{
     \__download_if_executable_test:nTF{wget}{
         \prg_return_true:
     }{
@@ -357,13 +365,14 @@
     \end{macro*}
 
     We also define an automatic equivalent of the engine \texttt{_do}
-    macros, which selects the engines in the order wget, cURL, aria2 
+    macros, which selects the engines in the order wget, cURL, aria2
     and axel.
     \begin{macro}{\__download_auto_do:nn}[2]
         {Filename to save file to, or \cs{NoValue}}
         {URL to fetch the file from}
+    \changes{1.2}{This macro is now protected}
 \begin{MacroCode}{package}
-\cs_new:Npn\__download_auto_do:nn#1#2{
+\cs_new_protected:Npn\__download_auto_do:nn#1#2{
     \__download_if_executable_test:nTF{wget}{
         \msg_info:nn{download}{use-wget}
         \__download_wget_do:nn{#1}{#2}
@@ -470,7 +479,7 @@
 }
 \end{MacroCode}
     \end{macro}
-    
+
     And we're done.
 \begin{MacroCode}{package}
 \endinput

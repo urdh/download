@@ -1,0 +1,9 @@
+\documentclass{minimal}
+\usepackage{verbatim}
+\usepackage[engine=auto]{../download}
+
+\begin{document}
+	\download[travis-wget.yml]%
+		{https://raw.github.com/urdh/download/master/.travis.yml}
+	\verbatiminput{travis-wget.yml}
+\end{document}
