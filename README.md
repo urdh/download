@@ -1,6 +1,6 @@
-[![Travis CI](https://img.shields.io/travis/urdh/download/master.svg)](http://travis-ci.org/urdh/download)
-[![CTAN: Version](https://img.shields.io/ctan/v/download.svg)](http://www.ctan.org/pkg/download)
-[![CTAN: License](https://img.shields.io/ctan/l/download.svg)](http://www.ctan.org/pkg/download)
+[![Travis CI](https://img.shields.io/travis/urdh/download/master)](http://travis-ci.org/urdh/download)
+[![CTAN: Version](https://img.shields.io/ctan/v/download)](http://www.ctan.org/pkg/download)
+[![CTAN: License](https://img.shields.io/ctan/l/download)](http://www.ctan.org/pkg/download)
 ```
 %% download - download files with LaTeX
 %%
