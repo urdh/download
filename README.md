@@ -1,4 +1,4 @@
-[![Travis CI](https://img.shields.io/travis/urdh/download/master)](http://travis-ci.org/urdh/download)
+[![Github CI](https://img.shields.io/github/actions/workflow/status/urdh/download/continuous-integration)](https://github.com/urdh/download/actions/workflows/continuous-integration.yml)
 [![CTAN: Version](https://img.shields.io/ctan/v/download)](http://www.ctan.org/pkg/download)
 [![CTAN: License](https://img.shields.io/ctan/l/download)](http://www.ctan.org/pkg/download)
 ```

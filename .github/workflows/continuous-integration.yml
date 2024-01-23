@@ -1,0 +1,52 @@
+name: Continuous integration
+on:
+  push:
+    branches: [master]
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  continuous-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: teatimeguest/setup-texlive-action@v3
+        with:
+          version: 2020
+          packages: >-
+            scheme-basic
+            collection-latexrecommended
+            biber
+            biblatex
+            csquotes
+            datatool
+            everyhook
+            fontaxes
+            glossaries
+            ly1
+            marginnote
+            mfirstuc
+            minted
+            mweights
+            needspace
+            opensans
+            paratype
+            sourcecodepro
+            svn-prov
+            xfor
+            xindy
+            xstring
+            ydoc
+            skdoc
+      - run: sudo apt-get install -y libncurses5
+      - run: sudo apt-get install -qq wget aria2 axel curl
+      - run: make dist
+      - run: make test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manual
+          path: download.pdf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle
+          path: download.tar.gz
