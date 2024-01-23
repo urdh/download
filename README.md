@@ -1,4 +1,4 @@
-[![Github CI](https://img.shields.io/github/actions/workflow/status/urdh/download/continuous-integration)](https://github.com/urdh/download/actions/workflows/continuous-integration.yml)
+[![Github CI](https://img.shields.io/github/actions/workflow/status/urdh/download/continuous-integration.yml)](https://github.com/urdh/download/actions/workflows/continuous-integration.yml)
 [![CTAN: Version](https://img.shields.io/ctan/v/download)](http://www.ctan.org/pkg/download)
 [![CTAN: License](https://img.shields.io/ctan/l/download)](http://www.ctan.org/pkg/download)
 ```
