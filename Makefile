@@ -50,13 +50,12 @@ download.tds.zip: all
 	cd download && zip $(ZIP_NOATTRS) -r ../download.tds.zip *
 	rm -rf download
 
-download.tar.gz: all download.tds.zip
+download.tar.gz: all
 	mkdir -p download
 	cp download.tex download/download.tex
 	cp download.pdf download/download.pdf
 	cp README download/README
 	cp Makefile download/Makefile
-	tar $(TAR_NOATTRS) -czf $@ download download.tds.zip
 	rm -rf download
 
 dist: download.tar.gz
